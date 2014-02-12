@@ -82,6 +82,7 @@ void context::set_source_rgba(double red, double green, double blue, double alph
 }
 
 void context::set_source(const pattern& source) {
+    // This is not dangerous because cairo will reference (and destroy) whenever its pattern changes.
     cairo_set_source(_Context.get(), source.native_handle());
 }
 
