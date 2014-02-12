@@ -9,17 +9,6 @@ region::region() {
     _Region = shared_ptr<cairo_region_t>(cairo_region_create(), &cairo_region_destroy);
 }
 
-region::region(const region& other) {
-    _Region = other._Region;
-}
-
-region& region::operator=(const region& other) {
-    if (this != &other) {
-        _Region = other._Region;
-    }
-    return *this;
-}
-
 region::region(region&& other) {
     _Region = move(other._Region);
     other._Region = nullptr;

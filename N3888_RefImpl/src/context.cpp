@@ -26,8 +26,8 @@ context& context::operator=(context&& other) {
     return *this;
 }
 
-context::context(surface& s)
-: _Surface(new surface(s)) {
+context::context(surface&& s)
+: _Surface(new surface(move(s))) {
     _Context = shared_ptr<cairo_t>(cairo_create(s.native_handle()), &cairo_destroy);
 }
 
@@ -48,8 +48,8 @@ void context::restore() {
     cairo_restore(_Context.get());
 }
 
-surface context::get_target() {
-    return surface(*_Surface);
+surface& context::get_target() {
+    return *_Surface;
 }
 
 void context::push_group() {

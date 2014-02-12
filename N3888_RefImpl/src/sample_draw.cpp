@@ -55,7 +55,8 @@ void sample_draw::operator()(context& ctxt, double elapsedTimeInMilliseconds) {
     const double radius = trunc(min((right - left) * 0.8 / elementCount, (bottom - top) + 120.0) / 2.0);
     const double beginX = trunc((right - left) * 0.1), y = trunc((bottom - top) * 0.5);
     ctxt.move_to(beginX, 50.0);
-    ctxt.set_source_rgb(1.0, 1.0, 1.0);
+    auto whiteSCP = solid_color_pattern(1.0, 1.0, 1.0);
+    ctxt.set_source(whiteSCP);
     ctxt.select_font_face("Segoe UI", font_slant::normal, font_weight::normal);
     ctxt.set_font_size(40.0);
     ctxt.show_text(string("Phase ").append(to_string(x + 1)).c_str());

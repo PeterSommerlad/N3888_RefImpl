@@ -322,8 +322,8 @@ namespace std {
                 native_handle_type native_handle() const;
 
                 region();
-                region(const region& other);
-                region& operator=(const region& other);
+                region(const region& other) = delete;
+                region& operator=(const region& other) = delete;
                 region(region&& other);
                 region& operator=(region&& other);
                 explicit region(native_handle_type nh);
@@ -360,8 +360,8 @@ namespace std {
                 typedef cairo_device_t* native_handle_type;
                 native_handle_type native_handle() const;
 
-                device(const device&) = default;
-                device& operator=(const device&) = default;
+                device(const device&) = delete;
+                device& operator=(const device&) = delete;
                 device(device&& other);
                 device& operator=(device&& other);
                 explicit device(native_handle_type nh);
@@ -380,8 +380,8 @@ namespace std {
                 typedef cairo_font_options_t* native_handle_type;
                 native_handle_type native_handle() const;
 
-                font_options(const font_options&) = default;
-                font_options& operator=(const font_options&) = default;
+                font_options(const font_options&) = delete;
+                font_options& operator=(const font_options&) = delete;
                 font_options(font_options&& other);
                 font_options& operator=(font_options&& other);
 
@@ -413,8 +413,8 @@ namespace std {
                 typedef cairo_font_face_t* native_handle_type;
                 native_handle_type native_handle() const;
 
-                font_face(const font_face&) = default;
-                font_face& operator=(const font_face&) = default;
+                font_face(const font_face&) = delete;
+                font_face& operator=(const font_face&) = delete;
                 font_face(font_face&& other);
                 font_face& operator=(font_face&& other);
 
@@ -431,8 +431,8 @@ namespace std {
                 typedef cairo_scaled_font_t* native_handle_type;
                 native_handle_type native_handle() const;
 
-                scaled_font(const scaled_font&) = default;
-                scaled_font& operator=(const scaled_font&) = default;
+                scaled_font(const scaled_font&) = delete;
+                scaled_font& operator=(const scaled_font&) = delete;
                 scaled_font(scaled_font&& other);
                 scaled_font& operator=(scaled_font&& other);
 
@@ -442,8 +442,8 @@ namespace std {
             class toy_font_face : public font_face {
                 toy_font_face() = delete;
             public:
-                toy_font_face(const toy_font_face&) = default;
-                toy_font_face& operator=(const toy_font_face&) = default;
+                toy_font_face(const toy_font_face&) = delete;
+                toy_font_face& operator=(const toy_font_face&) = delete;
                 toy_font_face(const ::std::string& family, font_slant slant, font_weight weight);
                 toy_font_face(toy_font_face&& other);
                 toy_font_face& operator=(toy_font_face&& other);
@@ -470,8 +470,8 @@ namespace std {
                 typedef cairo_surface_t* native_handle_type;
                 native_handle_type native_handle() const;
 
-                surface(const surface&) = default;
-                surface& operator=(const surface&) = default;
+                surface(const surface&) = delete;
+                surface& operator=(const surface&) = delete;
 
                 explicit surface(native_handle_type nh);
                 surface& operator=(native_handle_type nh);
@@ -521,8 +521,8 @@ namespace std {
                 void* _Create_from_png_closure;
                 ::std::shared_ptr<::std::vector<unsigned char>> _Data;
             public:
-                image_surface(const image_surface&) = default;
-                image_surface& operator=(const image_surface&) = default;
+                image_surface(const image_surface&) = delete;
+                image_surface& operator=(const image_surface&) = delete;
                 image_surface(image_surface&& other);
                 image_surface& operator=(image_surface&& other);
                 image_surface(surface::native_handle_type nh, surface::native_handle_type map_of);
@@ -555,8 +555,8 @@ namespace std {
 
                 explicit pattern(native_handle_type nh);
 
-                pattern(const pattern&) = default;
-                pattern& operator=(const pattern&) = default;
+                pattern(const pattern&) = delete;
+                pattern& operator=(const pattern&) = delete;
                 pattern(pattern&& other);
                 pattern& operator=(pattern&& other);
 
@@ -575,8 +575,8 @@ namespace std {
 
             class solid_color_pattern : public pattern {
             public:
-                solid_color_pattern(const solid_color_pattern&) = default;
-                solid_color_pattern& operator=(const solid_color_pattern&) = default;
+                solid_color_pattern(const solid_color_pattern&) = delete;
+                solid_color_pattern& operator=(const solid_color_pattern&) = delete;
                 solid_color_pattern(solid_color_pattern&& other);
                 solid_color_pattern& operator=(solid_color_pattern&& other);
                 solid_color_pattern(double red, double green, double blue);
@@ -590,8 +590,8 @@ namespace std {
             protected:
                 gradient_pattern(native_handle_type nh);
             public:
-                gradient_pattern(const gradient_pattern&) = default;
-                gradient_pattern& operator=(const gradient_pattern&) = default;
+                gradient_pattern(const gradient_pattern&) = delete;
+                gradient_pattern& operator=(const gradient_pattern&) = delete;
                 gradient_pattern(gradient_pattern&& other);
                 gradient_pattern& operator=(gradient_pattern&& other);
                 virtual ~gradient_pattern();
@@ -605,8 +605,8 @@ namespace std {
             class linear_pattern : public gradient_pattern {
                 linear_pattern() = delete;
             public:
-                linear_pattern(const linear_pattern&) = default;
-                linear_pattern& operator=(const linear_pattern&) = default;
+                linear_pattern(const linear_pattern&) = delete;
+                linear_pattern& operator=(const linear_pattern&) = delete;
                 linear_pattern(linear_pattern&& other);
                 linear_pattern& operator=(linear_pattern&& other);
                 linear_pattern(double x0, double y0, double x1, double y1);
@@ -615,8 +615,8 @@ namespace std {
 
             class radial_pattern : public gradient_pattern {
             public:
-                radial_pattern(const radial_pattern&) = default;
-                radial_pattern& operator=(const radial_pattern&) = default;
+                radial_pattern(const radial_pattern&) = delete;
+                radial_pattern& operator=(const radial_pattern&) = delete;
                 radial_pattern(radial_pattern&& other);
                 radial_pattern& operator=(radial_pattern&& other);
                 radial_pattern(double cx0, double cy0, double radius0, double cx1, double cy1, double radius1);
@@ -626,8 +626,8 @@ namespace std {
             class surface_pattern : public pattern {
                 surface_pattern() = delete;
             public:
-                surface_pattern(const surface_pattern&) = default;
-                surface_pattern& operator=(const surface_pattern&) = default;
+                surface_pattern(const surface_pattern&) = delete;
+                surface_pattern& operator=(const surface_pattern&) = delete;
                 surface_pattern(surface_pattern&& other);
                 surface_pattern& operator=(surface_pattern&& other);
                 explicit surface_pattern(surface& surface);
@@ -637,8 +637,8 @@ namespace std {
             class mesh_pattern : public pattern {
             public:
                 mesh_pattern();
-                mesh_pattern(const mesh_pattern&) = default;
-                mesh_pattern& operator=(const mesh_pattern&) = default;
+                mesh_pattern(const mesh_pattern&) = delete;
+                mesh_pattern& operator=(const mesh_pattern&) = delete;
                 mesh_pattern(mesh_pattern&& other);
                 mesh_pattern& operator=(mesh_pattern&& other);
                 void begin_patch();
@@ -673,8 +673,8 @@ namespace std {
 
                 raster_source_pattern() = delete;
             public:
-                raster_source_pattern(const raster_source_pattern&) = default;
-                raster_source_pattern& operator=(const raster_source_pattern&) = default;
+                raster_source_pattern(const raster_source_pattern&) = delete;
+                raster_source_pattern& operator=(const raster_source_pattern&) = delete;
                 raster_source_pattern(raster_source_pattern&& other);
                 raster_source_pattern& operator=(raster_source_pattern&& other);
                 raster_source_pattern(void* user_data, content content, int width, int height);
@@ -713,17 +713,17 @@ namespace std {
                 typedef cairo_t* native_handle_type;
                 native_handle_type native_handle() const;
 
-                context(const context&) = default;
-                context& operator=(const context&) = default;
+                context(const context&) = delete;
+                context& operator=(const context&) = delete;
                 context(context&& other);
                 context& operator=(context&& other);
                 explicit context(native_handle_type nh);
-                explicit context(surface& s);
+                explicit context(surface&& s);
 
                 ::std::experimental::drawing::status status();
                 void save();
                 void restore();
-                surface get_target();
+                surface& get_target();
                 void push_group();
                 void push_group_with_content(content c);
                 pattern pop_group();
