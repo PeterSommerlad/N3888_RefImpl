@@ -12,9 +12,9 @@ drawing_exception::drawing_exception(experimental::drawing::status s) noexcept :
 drawing_exception::~drawing_exception() noexcept { }
 
 const char * drawing_exception::what() const noexcept {
-	return cairo_status_to_string(_Status_to_cairo_status_t(_Status));
+    return cairo_status_to_string(_Status_to_cairo_status_t(_Status));
 }
 
 ::std::experimental::drawing::status drawing_exception::status() const noexcept {
-	return _Status;
+    return _Status;
 }

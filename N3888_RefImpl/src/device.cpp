@@ -6,44 +6,44 @@ using namespace std;
 using namespace std::experimental::drawing;
 
 device::native_handle_type device::native_handle() const {
-	return _Device.get();
+    return _Device.get();
 }
 
 device::device(device::native_handle_type nh)
 : _Device() {
-	_Device = shared_ptr<cairo_device_t>(nh, &cairo_device_destroy);
-	_Throw_if_failed_status(_Cairo_status_t_to_status(cairo_device_status(_Device.get())));
+    _Device = shared_ptr<cairo_device_t>(nh, &cairo_device_destroy);
+    _Throw_if_failed_status(_Cairo_status_t_to_status(cairo_device_status(_Device.get())));
 }
 
 device::device(device&& other) {
-	_Device = move(other._Device);
-	other._Device = nullptr;
+    _Device = move(other._Device);
+    other._Device = nullptr;
 }
 
 device& device::operator=(device&& other) {
-	if (this != &other) {
-		_Device = move(other._Device);
-		other._Device = nullptr;
-	}
-	return *this;
+    if (this != &other) {
+        _Device = move(other._Device);
+        other._Device = nullptr;
+    }
+    return *this;
 }
 
 status device::status() {
-	return _Cairo_status_t_to_status(cairo_device_status(_Device.get()));
+    return _Cairo_status_t_to_status(cairo_device_status(_Device.get()));
 }
 
 void device::finish() {
-	cairo_device_finish(_Device.get());
+    cairo_device_finish(_Device.get());
 }
 
 void device::flush() {
-	cairo_device_flush(_Device.get());
+    cairo_device_flush(_Device.get());
 }
 
 void device::acquire() {
-	_Throw_if_failed_status(_Cairo_status_t_to_status(cairo_device_acquire(_Device.get())));
+    _Throw_if_failed_status(_Cairo_status_t_to_status(cairo_device_acquire(_Device.get())));
 }
 
 void device::release() {
-	cairo_device_release(_Device.get());
+    cairo_device_release(_Device.get());
 }
