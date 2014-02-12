@@ -352,35 +352,10 @@ namespace std {
 				void xor_rectangle(const rectangle_int& rectangle);
 			};
 
-			class user_data_key {
-			public:
-#ifdef __clang__ // Workaround for Clang 3.3 not supporting 64-bit atomics on 32-bit GNU/Linux
-				typedef ::std::int_fast32_t key_type;
-#else
-				typedef ::std::int_fast64_t key_type;
-#endif
-			private:
-				static ::std::atomic<key_type> _Cnt;
-				key_type _Val;
-			public:
-				user_data_key();
-				user_data_key(const user_data_key&) = default;
-				user_data_key& operator=(const user_data_key&) = default;
-				user_data_key(user_data_key&& other);
-				user_data_key& operator=(user_data_key&& other);
-				key_type _Get_value() const;
-
-				bool operator<(const user_data_key& other) const { return _Val < other._Val; }
-				bool operator>(const user_data_key& other) const { return _Val > other._Val; }
-				bool operator==(const user_data_key& other) const { return _Val == other._Val; }
-				bool operator!=(const user_data_key& other) const { return _Val != other._Val; }
-			};
-
 			class device {
 				device() = delete;
 			protected:
 				::std::shared_ptr<cairo_device_t> _Device;
-				::std::shared_ptr<::std::map<user_data_key, ::std::shared_ptr<void>>> _User_data_map;
 			public:
 				typedef cairo_device_t* native_handle_type;
 				native_handle_type native_handle() const;
@@ -393,8 +368,6 @@ namespace std {
 				::std::experimental::drawing::status status();
 				void finish();
 				void flush();
-				void set_user_data(const user_data_key& key, ::std::shared_ptr<void>& value);
-				::std::shared_ptr<void>& get_user_data(const user_data_key& key);
 				void acquire();
 				void release();
 			};
@@ -488,7 +461,6 @@ namespace std {
 
 			protected:
 				::std::shared_ptr<cairo_surface_t> _Surface;
-				::std::shared_ptr<::std::map<user_data_key, ::std::shared_ptr<void>>> _User_data_map;
 
 				::std::shared_ptr<::std::function<void(void* closure, const ::std::vector<unsigned char>& data)>> _Write_to_png_fn;
 				void* _Write_to_png_closure;
@@ -529,8 +501,6 @@ namespace std {
 				void get_fallback_resolution(double& x_pixels_per_inch, double& y_pixels_per_inch);
 				void write_to_png(const ::std::string& filename);
 				void write_to_png_stream(::std::function<void(void* closure, const ::std::vector<unsigned char>& data)> write_fn, void* closure);
-				void set_user_data(const user_data_key& key, ::std::shared_ptr<void>& value);
-				::std::shared_ptr<void>& get_user_data(const user_data_key& key);
 				void copy_page();
 				void show_page();
 				bool has_show_text_glyphs();
@@ -579,7 +549,6 @@ namespace std {
 				pattern() = delete;
 			protected:
 				::std::shared_ptr<cairo_pattern_t> _Pattern;
-				::std::shared_ptr<::std::map<user_data_key, ::std::shared_ptr<void>>> _User_data_map;
 			public:
 				typedef cairo_pattern_t* native_handle_type;
 				native_handle_type native_handle() const;
@@ -602,9 +571,6 @@ namespace std {
 				void get_matrix(matrix& matrix);
 
 				pattern_type get_type();
-
-				void set_user_data(const user_data_key& key, ::std::shared_ptr<void>& value);
-				::std::shared_ptr<void>& get_user_data(const user_data_key& key);
 			};
 
 			class solid_color_pattern : public pattern {
@@ -741,7 +707,6 @@ namespace std {
 			class context {
 				::std::shared_ptr<surface> _Surface;
 				::std::shared_ptr<cairo_t> _Context;
-				::std::shared_ptr<::std::map<user_data_key, ::std::shared_ptr<void>>> _User_data_map;
 
 				context() = delete;
 			public:
@@ -825,9 +790,6 @@ namespace std {
 
 				void copy_page();
 				void show_page();
-
-				void set_user_data(const user_data_key& key, ::std::shared_ptr<void>& value);
-				::std::shared_ptr<void>& get_user_data(const user_data_key& key);
 
 				// Paths
 				path copy_path();
