@@ -26,6 +26,11 @@ context& context::operator=(context&& other) {
     return *this;
 }
 
+context::context(const surface& s)
+: _Surface(new surface(cairo_surface_reference(s.native_handle()))) {
+    _Context = shared_ptr<cairo_t>(cairo_create(s.native_handle()), &cairo_destroy);
+}
+
 context::context(surface&& s)
 : _Surface(new surface(move(s))) {
     _Context = shared_ptr<cairo_t>(cairo_create(s.native_handle()), &cairo_destroy);

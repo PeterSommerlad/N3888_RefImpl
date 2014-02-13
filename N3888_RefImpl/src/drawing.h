@@ -698,6 +698,7 @@ namespace std {
                 context(context&& other);
                 context& operator=(context&& other);
                 explicit context(native_handle_type nh);
+                explicit context(const surface& s);
                 explicit context(surface&& s);
 
                 ::std::experimental::drawing::status status();
