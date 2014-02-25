@@ -453,8 +453,9 @@ namespace std {
                 font_weight get_weight();
             };
 
-            // Forward declaration.
+            // Forward declarations.
             class image_surface;
+            class pattern;
 
             class surface {
                 surface() = delete;
@@ -509,7 +510,154 @@ namespace std {
                 bool supports_mime_type(const ::std::string& mime_type);
                 image_surface map_to_image(const rectangle_int& extents);
                 void unmap_image(image_surface& image);
+
+                // TODO: Contemplate caching all cairo_t state so that we can modify context so that calling get_target literally releases the surface, and adding a set_context that causes a new cairo_t to be created and the state to be set on it to match existing state.
+                class context {
+                public:
+                    typedef cairo_t* native_handle_type;
+                private:
+                    ::std::shared_ptr<cairo_t> _Context;
+                    friend class surface;
+                    context() = delete;
+                    //explicit context(native_handle_type nh);
+                    explicit context(const surface& s);
+
+                public:
+                    native_handle_type native_handle() const;
+
+                    context(const context&) = delete;
+                    context& operator=(const context&) = delete;
+                    context(context&& other);
+                    context& operator=(context&& other);
+
+                    ::std::experimental::drawing::status status();
+                    void save();
+                    void restore();
+                    //surface& get_target();// We're making context always obtained from its surface such that this functopm no longer makes sense.
+                    void push_group();
+                    void push_group_with_content(content c);
+                    pattern pop_group();
+                    void pop_group_to_source();
+                    //surface get_group_target(); // Eliminate this function since it can sometimes return the context's surface.
+
+                    void set_source_rgb(double red, double green, double blue);
+                    void set_source_rgba(double red, double green, double blue, double alpha);
+                    void set_source(const pattern& source);
+                    void set_source_surface(const surface& s, double x, double y);
+                    pattern get_source();
+
+                    void set_antialias(antialias a);
+                    antialias get_antialias();
+
+                    void set_dash(const ::std::vector<double>& dashes, double offset);
+                    int get_dash_count();
+                    void get_dash(::std::vector<double>& dashes, double& offset);
+
+                    void set_fill_rule(fill_rule fr);
+                    fill_rule get_fill_rule();
+
+                    void set_line_cap(line_cap lc);
+                    line_cap get_line_cap();
+
+                    void set_line_join(line_join lj);
+                    line_join get_line_join();
+
+                    void set_line_width(double width);
+                    double get_line_width();
+
+                    void set_miter_limit(double limit);
+                    double get_miter_limit();
+
+                    void set_compositing_operator(compositing_operator co);
+                    compositing_operator get_compositing_operator();
+
+                    void set_tolerance(double tolerance);
+                    double get_tolerance();
+
+                    void clip();
+                    void clip_preserve();
+                    void clip_extents(double& x1, double& y1, double& x2, double& y2);
+                    bool in_clip(double x, double y);
+                    void reset_clip();
+
+                    rectangle_list copy_clip_rectangle_list();
+
+                    void fill();
+                    void fill_preserve();
+                    void fill_extents(double& x1, double& y1, double& x2, double& y2);
+                    bool in_fill(double x, double y);
+
+                    void mask(pattern& pattern);
+                    void mask_surface(surface& surface, double surface_x, double surface_y);
+
+                    void paint();
+                    void paint_with_alpha(double alpha);
+
+                    void stroke();
+                    void stroke_preserve();
+                    void stroke_extents(double& x1, double& y1, double& x2, double& y2);
+                    bool in_stroke(double x, double y);
+
+                    void copy_page();
+                    void show_page();
+
+                    // Paths
+                    path copy_path();
+                    path copy_path_flat();
+                    void append_path(const path& p);
+                    bool has_current_point();
+                    void get_current_point(double& x, double& y);
+                    void new_path();
+                    void new_sub_path();
+                    void close_path();
+                    void arc(double xc, double yc, double radius, double angle1, double angle2);
+                    void arc_negative(double xc, double yc, double radius, double angle1, double angle2);
+                    void curve_to(double x1, double y1, double x2, double y2, double x3, double y3);
+                    void line_to(double x, double y);
+                    void move_to(double x, double y);
+                    void rectangle(double x, double y, double width, double height);
+                    void glyph_path(const ::std::vector<glyph>& glyphs);
+                    void text_path(const ::std::string& utf8);
+                    void rel_curve_to(double dx1, double dy1, double dx2, double dy2, double dx3, double dy3);
+                    void rel_line_to(double dx, double dy);
+                    void rel_move_to(double dx, double dy);
+                    void path_extents(double& x1, double& y1, double& x2, double& y2);
+
+                    // Transformations
+                    void translate(double tx, double ty);
+                    void scale(double sx, double sy);
+                    void rotate(double angle);
+                    void transform(const matrix& matrix);
+                    void set_matrix(const matrix& matrix);
+                    void get_matrix(matrix& matrix);
+                    void identity_matrix();
+                    void user_to_device(double& x, double& y);
+                    void user_to_device_distance(double& dx, double& dy);
+                    void device_to_user(double& x, double& y);
+                    void device_to_user_distance(double& dx, double& dy);
+
+                    // Text
+                    void select_font_face(const ::std::string& family, font_slant slant, font_weight weight);
+                    void set_font_size(double size);
+                    void set_font_matrix(const matrix& matrix);
+                    void get_font_matrix(matrix& matrix);
+                    void set_font_options(const font_options& options);
+                    void get_font_options(font_options& options);
+                    void set_font_face(font_face& font_face);
+                    font_face get_font_face();
+                    void set_scaled_font(const scaled_font& scaled_font);
+                    scaled_font get_scaled_font();
+                    void show_text(const ::std::string& utf8);
+                    void show_glyphs(const ::std::vector<glyph>& glyphs);
+                    void show_text_glyphs(const ::std::string& utf8, const ::std::vector<glyph>& glyphs, const ::std::vector<text_cluster>& clusters, text_cluster_flags::text_cluster_flags cluster_flags);
+                    void font_extents(font_extents& extents);
+                    void text_extents(const ::std::string& utf8, text_extents& extents);
+                    void glyph_extents(const ::std::vector<glyph>& glyphs, ::std::experimental::drawing::text_extents& extents);
+                };
+
+                context& get_context();
             protected:
+                ::std::unique_ptr<context> _Context;
                 static cairo_status_t _Cairo_write_to_png_stream(void* this_ptr, const unsigned char* data, unsigned int length);
             };
 
@@ -682,147 +830,6 @@ namespace std {
                     ::std::function<surface(void* callback_data, surface& target, const rectangle_int& extents)>& acquire_fn,
                     ::std::function<void(void* callback_data, surface& surface)>& release_fn
                     );
-            };
-
-            class context {
-                ::std::shared_ptr<surface> _Surface;
-                ::std::shared_ptr<cairo_t> _Context;
-
-                context() = delete;
-            public:
-                typedef cairo_t* native_handle_type;
-                native_handle_type native_handle() const;
-
-                context(const context&) = delete;
-                context& operator=(const context&) = delete;
-                context(context&& other);
-                context& operator=(context&& other);
-                explicit context(native_handle_type nh);
-                explicit context(surface&& s);
-
-                ::std::experimental::drawing::status status();
-                void save();
-                void restore();
-                surface& get_target();
-                void push_group();
-                void push_group_with_content(content c);
-                pattern pop_group();
-                void pop_group_to_source();
-                surface get_group_target();
-
-                void set_source_rgb(double red, double green, double blue);
-                void set_source_rgba(double red, double green, double blue, double alpha);
-                void set_source(const pattern& source);
-                void set_source_surface(const surface& s, double x, double y);
-                pattern get_source();
-
-                void set_antialias(antialias a);
-                antialias get_antialias();
-
-                void set_dash(const ::std::vector<double>& dashes, double offset);
-                int get_dash_count();
-                void get_dash(::std::vector<double>& dashes, double& offset);
-
-                void set_fill_rule(fill_rule fr);
-                fill_rule get_fill_rule();
-
-                void set_line_cap(line_cap lc);
-                line_cap get_line_cap();
-
-                void set_line_join(line_join lj);
-                line_join get_line_join();
-
-                void set_line_width(double width);
-                double get_line_width();
-
-                void set_miter_limit(double limit);
-                double get_miter_limit();
-
-                void set_compositing_operator(compositing_operator co);
-                compositing_operator get_compositing_operator();
-
-                void set_tolerance(double tolerance);
-                double get_tolerance();
-
-                void clip();
-                void clip_preserve();
-                void clip_extents(double& x1, double& y1, double& x2, double& y2);
-                bool in_clip(double x, double y);
-                void reset_clip();
-
-                rectangle_list copy_clip_rectangle_list();
-
-                void fill();
-                void fill_preserve();
-                void fill_extents(double& x1, double& y1, double& x2, double& y2);
-                bool in_fill(double x, double y);
-
-                void mask(pattern& pattern);
-                void mask_surface(surface& surface, double surface_x, double surface_y);
-
-                void paint();
-                void paint_with_alpha(double alpha);
-
-                void stroke();
-                void stroke_preserve();
-                void stroke_extents(double& x1, double& y1, double& x2, double& y2);
-                bool in_stroke(double x, double y);
-
-                void copy_page();
-                void show_page();
-
-                // Paths
-                path copy_path();
-                path copy_path_flat();
-                void append_path(const path& p);
-                bool has_current_point();
-                void get_current_point(double& x, double& y);
-                void new_path();
-                void new_sub_path();
-                void close_path();
-                void arc(double xc, double yc, double radius, double angle1, double angle2);
-                void arc_negative(double xc, double yc, double radius, double angle1, double angle2);
-                void curve_to(double x1, double y1, double x2, double y2, double x3, double y3);
-                void line_to(double x, double y);
-                void move_to(double x, double y);
-                void rectangle(double x, double y, double width, double height);
-                void glyph_path(const ::std::vector<glyph>& glyphs);
-                void text_path(const ::std::string& utf8);
-                void rel_curve_to(double dx1, double dy1, double dx2, double dy2, double dx3, double dy3);
-                void rel_line_to(double dx, double dy);
-                void rel_move_to(double dx, double dy);
-                void path_extents(double& x1, double& y1, double& x2, double& y2);
-
-                // Transformations
-                void translate(double tx, double ty);
-                void scale(double sx, double sy);
-                void rotate(double angle);
-                void transform(const matrix& matrix);
-                void set_matrix(const matrix& matrix);
-                void get_matrix(matrix& matrix);
-                void identity_matrix();
-                void user_to_device(double& x, double& y);
-                void user_to_device_distance(double& dx, double& dy);
-                void device_to_user(double& x, double& y);
-                void device_to_user_distance(double& dx, double& dy);
-
-                // Text
-                void select_font_face(const ::std::string& family, font_slant slant, font_weight weight);
-                void set_font_size(double size);
-                void set_font_matrix(const matrix& matrix);
-                void get_font_matrix(matrix& matrix);
-                void set_font_options(const font_options& options);
-                void get_font_options(font_options& options);
-                void set_font_face(font_face& font_face);
-                font_face get_font_face();
-                void set_scaled_font(const scaled_font& scaled_font);
-                scaled_font get_scaled_font();
-                void show_text(const ::std::string& utf8);
-                void show_glyphs(const ::std::vector<glyph>& glyphs);
-                void show_text_glyphs(const ::std::string& utf8, const ::std::vector<glyph>& glyphs, const ::std::vector<text_cluster>& clusters, text_cluster_flags::text_cluster_flags cluster_flags);
-                void font_extents(font_extents& extents);
-                void text_extents(const ::std::string& utf8, text_extents& extents);
-                void glyph_extents(const ::std::vector<glyph>& glyphs, ::std::experimental::drawing::text_extents& extents);
             };
 
             int format_stride_for_width(format format, int width);

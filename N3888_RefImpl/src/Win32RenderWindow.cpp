@@ -56,7 +56,7 @@ handle(0)
     }
 
     // Create the initial surface for drawing to.
-    g_psurface = shared_ptr<surface>(new surface(move(make_surface(format::argb32, width, height))));
+    g_psurface = shared_ptr<image_surface>(new image_surface(format::argb32, width, height));
 
     // Set in the "extra" bytes the pointer to the 'this' pointer
     // so it can handle messages for itself.
@@ -152,7 +152,7 @@ LRESULT Win32RenderWindow::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM
         int width = LOWORD(lparam);//lparam & 0xFFFF;
         int height = HIWORD(lparam);//(lparam & 0xFFFF0000) >> 16;
 
-        g_psurface = unique_ptr<surface>(new surface(move(make_surface(format::argb32, width, height))));
+        g_psurface = unique_ptr<image_surface>(new image_surface(format::argb32, width, height));
 
     } break;
 
@@ -211,7 +211,7 @@ LRESULT Win32RenderWindow::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM
         g_psurface->flush();
 
         auto surface = make_surface(cairo_win32_surface_create(hdc));
-        auto ctxt = context(surface);
+        auto& ctxt = surface.get_context();
         ctxt.set_source_surface(*g_psurface, 0.0, 0.0);
         ctxt.paint();
         surface.flush();
@@ -315,6 +315,6 @@ void Win32RenderWindow::ShowSaveAsPNGDialog() {
 
 }
 
-const shared_ptr<surface>& Win32RenderWindow::GetSurface() {
+const shared_ptr<image_surface>& Win32RenderWindow::GetSurface() {
     return g_psurface;
 }

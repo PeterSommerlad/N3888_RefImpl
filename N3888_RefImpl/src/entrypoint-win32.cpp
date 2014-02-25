@@ -68,8 +68,8 @@ int WINAPI wWinMain(
             // Draw to the off-screen buffer.
             timer.update();
             sample_draw sampleDraw;
-            auto& renderTarget = *window.GetSurface();
-            auto rtCtxt = context(renderTarget);
+            auto& renderTarget = *(window.GetSurface());
+            auto& rtCtxt = renderTarget.get_context();
             sampleDraw(rtCtxt, timer.get_elapsed_time());
 
             // Flush to ensure that it is drawn to the window.
@@ -77,7 +77,7 @@ int WINAPI wWinMain(
             auto hdc = GetDC(window.GetHandle());
             {
                 auto surface = make_surface(cairo_win32_surface_create(hdc));
-                auto ctxt = context(surface);
+                auto& ctxt = surface.get_context();
                 ctxt.set_source_surface(*window.GetSurface(), 0.0, 0.0);
                 ctxt.paint();
                 surface.flush();

@@ -10,20 +10,19 @@ surface::native_handle_type surface::native_handle() const {
 }
 
 surface::surface(surface::native_handle_type native_handle)
-: _Surface()
+: _Surface(native_handle, &cairo_surface_destroy)
 , _Write_to_png_fn(new ::std::function<void(void* closure, const ::std::vector<unsigned char>& data)>)
 , _Write_to_png_closure()
 , _Mime_data_destroy_fn_map(new ::std::map<::std::string, ::std::function<void(void* data)>>)
 , _Mime_data_destroy_closure_map(new ::std::map<::std::string, void*>) {
-    _Surface = shared_ptr<cairo_surface_t>(native_handle, &cairo_surface_destroy);
 }
 
-surface::surface(surface&& other) {
-    _Surface = move(other._Surface);
-    _Write_to_png_fn = move(other._Write_to_png_fn);
-    _Write_to_png_closure = move(other._Write_to_png_closure);
-    _Mime_data_destroy_fn_map = move(other._Mime_data_destroy_fn_map);
-    _Mime_data_destroy_closure_map = move(other._Mime_data_destroy_closure_map);
+surface::surface(surface&& other)
+: _Surface(move(other._Surface))
+, _Write_to_png_fn(move(other._Write_to_png_fn))
+, _Write_to_png_closure(move(other._Write_to_png_closure))
+, _Mime_data_destroy_fn_map(move(other._Mime_data_destroy_fn_map))
+, _Mime_data_destroy_closure_map(move(other._Mime_data_destroy_closure_map)) {
     other._Surface = nullptr;
     other._Write_to_png_fn = nullptr;
     other._Write_to_png_closure = nullptr;
@@ -53,17 +52,15 @@ surface& surface::operator=(surface::native_handle_type nh) {
 }
 
 surface::surface(surface& other, content content, int width, int height)
-: _Surface()
+: _Surface(cairo_surface_create_similar(other._Surface.get(), _Content_to_cairo_content_t(content), width, height), &cairo_surface_destroy)
 , _Write_to_png_fn()
 , _Write_to_png_closure() {
-    _Surface = shared_ptr<cairo_surface_t>(cairo_surface_create_similar(other._Surface.get(), _Content_to_cairo_content_t(content), width, height), &cairo_surface_destroy);
 }
 
 surface::surface(surface& target, double x, double y, double width, double height)
-: _Surface()
+: _Surface(cairo_surface_create_for_rectangle(target._Surface.get(), x, y, width, height), &cairo_surface_destroy)
 , _Write_to_png_fn()
 , _Write_to_png_closure() {
-    _Surface = shared_ptr<cairo_surface_t>(cairo_surface_create_for_rectangle(target._Surface.get(), x, y, width, height), &cairo_surface_destroy);
 }
 
 surface::~surface() {
@@ -216,4 +213,11 @@ image_surface surface::map_to_image(const rectangle_int& extents) {
 
 void surface::unmap_image(image_surface& image) {
     image._Surface = shared_ptr<cairo_surface_t>(cairo_image_surface_create(CAIRO_FORMAT_INVALID, 0, 0), &cairo_surface_destroy);
+}
+
+surface::context& surface::get_context() {
+    if (_Context == nullptr || cairo_get_target(_Context->_Context.get()) != _Surface.get()) {
+        _Context = unique_ptr<context>(new context(*this));
+    }
+    return *_Context;
 }
